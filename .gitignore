@@ -1,0 +1,34 @@
+# --- Project files
+
+# data directory
+data/*
+
+# log files
+*.log
+
+# --- Jupyter files
+
+.ipynb_checkpoints
+.jupyter/migrated
+
+# --- Python files
+
+# compiled source
+*.pyc
+
+# testing
+.cache
+.coverage
+.coverage.*
+.pytest_cache
+
+# --- Miscellaneous
+
+# autoenv
+.env
+
+# vim
+.*.swp
+
+# macOS
+.DS_Store*
