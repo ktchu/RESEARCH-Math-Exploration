@@ -6,10 +6,10 @@
 # ### Authors
 # * Kevin Chu (kevin@velexi.com)
 # 
-# ### Summary
+# ### Overview
 # * In this Jupyter notebook, we explore the probability distribution of exponential moving averages (EMAs).
 # 
-# #### Definitions
+# ### Definitions
 # 
 # Let $X = \{X_0, X_1, X_2, \ldots \}$ be a times series where $X_i$ is a random variable probability distribution $p(x)$ for all $i$. For smoothing parameter $\alpha$, define the EMAs $Y_n$ of $X$ as follows.
 # 
@@ -17,7 +17,7 @@
 # 
 # * $Y_{n+1} = \alpha Y_n + (1 - \alpha) X_n$    
 # 
-# #### Key Results
+# ### Key Results
 # * For sufficiently large $n$, the probability distribution of $Y_n$ ranges between being similar to $p(x)$ (when $\alpha$ is near 0) and a Gaussian distribution (when $\alpha$ is near 1).
 # 
 #     * _Intuition_. $Y_n$ is mostly equal to $X_n$ when $\alpha$ is near 0, so the probability distributions of $Y_n$ and $X_n$ would be expected to be similar. When $\alpha$ is near 1, then $Y_n$ has significant contributions from all of the $X_i$. As a result, $Y_n - X_0$ is similar to a the sum of i.i.d. random variables, which approaches a Gaussian for large $n$.
