@@ -20,9 +20,9 @@
 # * $Y_{n+1} = \alpha Y_n + (1 - \alpha) X_n$    
 # 
 # ### Key Results
-# * For sufficiently large $n$, the probability distribution of $Y_n$ ranges between being similar to $p(x)$ (when $\alpha$ is near 0) and a Gaussian distribution (when $\alpha$ is near 1).
+# * For sufficiently large $n$, the probability distribution of $Y_n$ ranges between being similar to $p(x)$ (when $\alpha$ is near 0) and a Gaussian-like distribution (when $\alpha$ is near 1).
 # 
-#     * _Intuition_. $Y_n$ is mostly equal to $X_n$ when $\alpha$ is near 0, so the probability distributions of $Y_n$ and $X_n$ would be expected to be similar. When $\alpha$ is near 1, then $Y_n$ has significant contributions from all of the $X_i$. As a result, $Y_n - X_0$ is similar to a the sum of i.i.d. random variables, which approaches a Gaussian for large $n$.
+#     * _Intuition_. $Y_n$ is mostly equal to $X_n$ when $\alpha$ is near 0, so the probability distributions of $Y_n$ and $X_n$ would be expected to be similar. When $\alpha$ is near 1, then $Y_n$ has significant contributions from all of the $X_i$. As a result, $Y_n - X_0$ is similar to the sum of i.i.d. random variables, which approaches a Gaussian for large $n$.
 #     
 # * If all of the $X_i$ are drawn from the same probability distribution, then $E[Y_n] = E[X]$.
 # 
