@@ -3,7 +3,7 @@
 
 # ## 2020-07-01: Exploring the Probability Distribution of Exponential Moving Averages (EMAs)
 # 
-# *Last Updated*: 2020-07-03
+# *Last Updated*: 2020-07-04
 # 
 # ### Authors
 # * Kevin Chu (kevin@velexi.com)
@@ -17,12 +17,12 @@
 # 
 # * $Y_0 = X_0$
 # 
-# * $Y_{n+1} = \alpha Y_n + (1 - \alpha) X_n$    
+# * $Y_{n+1} = \alpha X_n + (1 - \alpha) Y_n$    
 # 
 # ### Key Results
-# * For sufficiently large $n$, the probability distribution of $Y_n$ ranges between being similar to $p(x)$ (when $\alpha$ is near 0) and a Gaussian-like distribution (when $\alpha$ is near 1).
+# * For sufficiently large $n$, the probability distribution of $Y_n$ ranges between being similar to $p(x)$ (when $\alpha$ is near 1) and a Gaussian-like distribution (when $\alpha$ is near 0).
 # 
-#     * _Intuition_. $Y_n$ is mostly equal to $X_n$ when $\alpha$ is near 0, so the probability distributions of $Y_n$ and $X_n$ would be expected to be similar. When $\alpha$ is near 1, then $Y_n$ has significant contributions from all of the $X_i$. As a result, $Y_n - X_0$ is similar to the sum of i.i.d. random variables, which approaches a Gaussian for large $n$.
+#     * _Intuition_. $Y_n$ is mostly equal to $X_n$ when $\alpha$ is near 1, so the probability distributions of $Y_n$ and $X_n$ would be expected to be similar. When $\alpha$ is near 0, then $Y_n$ has significant contributions from all of the $X_i$. As a result, $Y_n - X_0$ is similar to the sum of i.i.d. random variables, which approaches a Gaussian for large $n$.
 #     
 # * If all of the $X_i$ are drawn from the same probability distribution, then $E[Y_n] = E[X]$.
 # 
@@ -32,7 +32,7 @@
 # * As $n \rightarrow \infty$,
 # 
 #   $$
-#     Var[Y_n] \rightarrow \left( \frac{1 - \alpha}{1 + \alpha} \right) Var[X].
+#     Var[Y_n] \rightarrow \left( \frac{\alpha}{2 - \alpha} \right) Var[X].
 #   $$
 #   
 #     * This result holds regardless of whether $X_0$ is drawn from the same probability distribution as the rest of the $X_i$.
@@ -98,7 +98,7 @@ def compute_ema(x, alpha):
     ema = np.empty(x.shape, dtype=np.float64)
     ema[0] = x[0]
     for i in range(1, num_time_samples):
-        ema[i] = alpha * ema[i-1] + (1 - alpha) * x[i]
+        ema[i] = alpha * x[i] + (1 - alpha) * ema[i-1]
     return ema
 
 
@@ -125,7 +125,7 @@ elapsed_time_initial = t_end - t_start
 assert (ema[0,:] == x_test[0,:]).all()
 for i in range(1, num_time_points_test):
     assert np.allclose(
-        ema[i,:], (alpha_test * ema[i-1,:] + (1-alpha_test)*x_test[i,:]))
+        ema[i,:], (alpha_test * x_test[i,:] + (1-alpha_test)*ema[i-1,:]))
     
 # Verify computational performance boost from Numba
 t_start = time.time()
@@ -180,13 +180,13 @@ print("Var[X]: {:.3g}".format(x_var))
 sns.distplot(x[0,:])
 
 
-# ### Probability distribution of final EMA values for a small $\alpha$ value
+# ### Probability distribution of final EMA values for a large $\alpha$ value
 
-# In[ ]:
+# In[8]:
 
 
 # Exponential Moving Average (EMA) parameters
-alpha = 0.05
+alpha = 0.95
 
 # Compute exponential moving averages
 t_start = time.time()
@@ -201,8 +201,8 @@ ema_final = ema[-1,:]
 print("E[EMA]: {:.3g}".format(ema_final.mean()))
 print("Var[EMA]: {:.3g}".format(ema_final.var()))
 
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 
 # Visualize distribution at end time
 sns.distplot(ema_final)
@@ -211,9 +211,139 @@ sns.distplot(ema_final)
 sns.kdeplot(x[0,:])
 
 
+# ### Probability distribution of EMA values within a single time series for large $\alpha$ value
+
+# In[9]:
+
+
+# Exponential Moving Average (EMA) parameters
+alpha = 0.95
+
+# Compute exponential moving averages
+t_start = time.time()
+ema_time_series = compute_ema(x[0,:], alpha=alpha)
+t_end = time.time()
+print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
+
+# Compute mean and variance of time series values
+ema_mean = ema_time_series.mean()
+ema_var = ema_time_series.var()
+print("E[EMA]: {:.3g}".format(ema_mean))
+print("Var[EMA]: {:.3g}".format(ema_var))
+
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
+
+# Visualize distribution of time series values
+sns.distplot(ema_time_series)
+
+# Compare with distribution for X
+sns.kdeplot(x[0,:])
+
+
+# ### Probability distribution of final EMA values for medium $\alpha$ value
+
+# In[10]:
+
+
+# Exponential Moving Average (EMA) parameters
+alpha = 0.5
+
+# Compute exponential moving averages
+t_start = time.time()
+ema = compute_ema(x, alpha=alpha)
+t_end = time.time()
+print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
+
+# Get final EMA values
+ema_final = ema[-1,:]
+
+# Compute mean and variance of final EMA values
+ema_mean = ema_final.mean()
+ema_var = ema_final.var()
+print("E[EMA]: {:.3g}".format(ema_mean))
+print("Var[EMA]: {:.3g}".format(ema_var))
+
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
+
+# Visualize distribution of final EMA values
+sns.distplot(ema_final)
+
+# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
+g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
+sns.kdeplot(g)
+
+
+# ### Probability distribution of EMA values within a single time series for medium $\alpha$ value
+
+# In[11]:
+
+
+# Exponential Moving Average (EMA) parameters
+alpha = 0.5
+
+# Compute exponential moving averages
+t_start = time.time()
+ema_time_series = compute_ema(x[0,:], alpha=alpha)
+t_end = time.time()
+print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
+
+# Compute mean and variance of time series values
+ema_mean = ema_time_series.mean()
+ema_var = ema_time_series.var()
+print("E[EMA]: {:.3g}".format(ema_mean))
+print("Var[EMA]: {:.3g}".format(ema_var))
+
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
+
+# Visualize distribution of time series values
+sns.distplot(ema_time_series)
+
+# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
+g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
+sns.kdeplot(g)
+
+
+# ### Probability distribution of final EMA values for a small $\alpha$ value
+
+# In[12]:
+
+
+# Exponential Moving Average (EMA) parameters
+alpha = 0.05
+
+# Compute exponential moving averages
+t_start = time.time()
+ema = compute_ema(x, alpha=alpha)
+t_end = time.time()
+print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
+
+# Get final EMA values
+ema_final = ema[-1,:]
+
+# Compute mean and variance of final EMA values
+ema_mean = ema_final.mean()
+ema_var = ema_final.var()
+print("E[EMA]: {:.3g}".format(ema_mean))
+print("Var[EMA]: {:.3g}".format(ema_var))
+
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
+print("Approximate Asymptotic Var[EMA]: {:.3g}".format(alpha / 2 * x_var))
+
+# Visualize distribution of final EMA values
+sns.distplot(ema_final)
+
+# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
+g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
+sns.kdeplot(g)
+
+
 # ### Probability distribution of EMA values within a single time series for small $\alpha$ value
 
-# In[ ]:
+# In[13]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -231,139 +361,9 @@ ema_var = ema_time_series.var()
 print("E[EMA]: {:.3g}".format(ema_mean))
 print("Var[EMA]: {:.3g}".format(ema_var))
 
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
-
-# Visualize distribution of time series values
-sns.distplot(ema_time_series)
-
-# Compare with distribution for X
-sns.kdeplot(x[0,:])
-
-
-# ### Probability distribution of final EMA values for medium $\alpha$ value
-
-# In[ ]:
-
-
-# Exponential Moving Average (EMA) parameters
-alpha = 0.5
-
-# Compute exponential moving averages
-t_start = time.time()
-ema = compute_ema(x, alpha=alpha)
-t_end = time.time()
-print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
-
-# Get final EMA values
-ema_final = ema[-1,:]
-
-# Compute mean and variance of final EMA values
-ema_mean = ema_final.mean()
-ema_var = ema_final.var()
-print("E[EMA]: {:.3g}".format(ema_mean))
-print("Var[EMA]: {:.3g}".format(ema_var))
-
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
-
-# Visualize distribution of final EMA values
-sns.distplot(ema_final)
-
-# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
-g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
-
-
-# ### Probability distribution of EMA values within a single time series for medium $\alpha$ value
-
-# In[ ]:
-
-
-# Exponential Moving Average (EMA) parameters
-alpha = 0.5
-
-# Compute exponential moving averages
-t_start = time.time()
-ema_time_series = compute_ema(x[0,:], alpha=alpha)
-t_end = time.time()
-print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
-
-# Compute mean and variance of time series values
-ema_mean = ema_time_series.mean()
-ema_var = ema_time_series.var()
-print("E[EMA]: {:.3g}".format(ema_mean))
-print("Var[EMA]: {:.3g}".format(ema_var))
-
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
-
-# Visualize distribution of time series values
-sns.distplot(ema_time_series)
-
-# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
-g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
-
-
-# ### Probability distribution of final EMA values for a large $\alpha$ value
-
-# In[ ]:
-
-
-# Exponential Moving Average (EMA) parameters
-alpha = 0.95
-
-# Compute exponential moving averages
-t_start = time.time()
-ema = compute_ema(x, alpha=alpha)
-t_end = time.time()
-print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
-
-# Get final EMA values
-ema_final = ema[-1,:]
-
-# Compute mean and variance of final EMA values
-ema_mean = ema_final.mean()
-ema_var = ema_final.var()
-print("E[EMA]: {:.3g}".format(ema_mean))
-print("Var[EMA]: {:.3g}".format(ema_var))
-
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
-print("Approximate Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / 2 * x_var))
-
-# Visualize distribution of final EMA values
-sns.distplot(ema_final)
-
-# Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
-g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
-
-
-# ### Probability distribution of EMA values within a single time series for large $\alpha$ value
-
-# In[ ]:
-
-
-# Exponential Moving Average (EMA) parameters
-alpha = 0.95
-
-# Compute exponential moving averages
-t_start = time.time()
-ema_time_series = compute_ema(x[0,:], alpha=alpha)
-t_end = time.time()
-print("Runtime 'compute_ema()': {:.3g}s".format(t_end - t_start))
-
-# Compute mean and variance of time series values
-ema_mean = ema_time_series.mean()
-ema_var = ema_time_series.var()
-print("E[EMA]: {:.3g}".format(ema_mean))
-print("Var[EMA]: {:.3g}".format(ema_var))
-
-# Compare variance with asymptotic variance of (1-alpha)/(1+alpha)*Var[X]
-print("Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / (1 + alpha) * x_var))
-print("Approximate Asymptotic Var[EMA]: {:.3g}".format((1 - alpha) / 2 * x_var))
+# Compare variance with asymptotic variance of alpha/(2 - alpha)*Var[X]
+print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
+print("Approximate Asymptotic Var[EMA]: {:.3g}".format(alpha / 2 * x_var))
 
 # Visualize distribution of time series values
 sns.distplot(ema_time_series)
