@@ -182,7 +182,7 @@ sns.distplot(x[0,:])
 
 # ### Probability distribution of final EMA values for a small $\alpha$ value
 
-# In[8]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -211,9 +211,9 @@ sns.distplot(ema_final)
 sns.kdeplot(x[0,:])
 
 
-# ### Probability distribution EMA values within a single time series for small $\alpha$ value
+# ### Probability distribution of EMA values within a single time series for small $\alpha$ value
 
-# In[9]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -243,7 +243,7 @@ sns.kdeplot(x[0,:])
 
 # ### Probability distribution of final EMA values for medium $\alpha$ value
 
-# In[10]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -275,9 +275,9 @@ g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
 sns.kdeplot(g)
 
 
-# ### Probability distribution EMA values within a single time series for medium $\alpha$ value
+# ### Probability distribution of EMA values within a single time series for medium $\alpha$ value
 
-# In[11]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -308,7 +308,7 @@ sns.kdeplot(g)
 
 # ### Probability distribution of final EMA values for a large $\alpha$ value
 
-# In[12]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
@@ -341,9 +341,9 @@ g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
 sns.kdeplot(g)
 
 
-# ### Probability distribution EMA values within a single time series for large $\alpha$ value
+# ### Probability distribution of EMA values within a single time series for large $\alpha$ value
 
-# In[13]:
+# In[ ]:
 
 
 # Exponential Moving Average (EMA) parameters
