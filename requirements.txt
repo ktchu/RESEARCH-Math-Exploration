@@ -16,8 +16,9 @@ jupyter
 # Basic utility packages
 PyYAML
 
-# Data science packages
+# Math and statistics packages
 matplotlib
+numba
 numpy
 pandas
 scikit-learn
