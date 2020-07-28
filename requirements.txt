@@ -15,6 +15,7 @@ jupyter
 
 # Basic utility packages
 PyYAML
+tqdm
 
 # Math and statistics packages
 matplotlib
