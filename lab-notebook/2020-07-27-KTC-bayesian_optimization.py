@@ -11,7 +11,7 @@
 # ### Overview
 # In this Jupyter notebook, we explore Bayesian optimization.
 # 
-# * For the Gaussian process in the example uses the Matern kernel, which is a generalization
+# * The Gaussian process in the example uses the Matern kernel, which is a generalization
 #   of the RBF kernel.
 # 
 # ### User parameters
