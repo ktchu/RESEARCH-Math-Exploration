@@ -24,6 +24,10 @@ data/*
 
 # --- Miscellaneous
 
+# direnv
+.direnv
+.envrc
+
 # autoenv
 .env
 
