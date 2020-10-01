@@ -22,6 +22,10 @@ data/*
 .coverage.*
 .pytest_cache
 
+# --- Julia files
+
+Manifest.toml
+
 # --- Miscellaneous
 
 # direnv
