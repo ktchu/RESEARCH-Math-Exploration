@@ -14263,20 +14263,26 @@ a.anchor-link {
 <h3 id="Authors">Authors<a class="anchor-link" href="#Authors">&#182;</a></h3><ul>
 <li>Kevin Chu (kevin@velexi.com)</li>
 </ul>
-<h3 id="Overview">Overview<a class="anchor-link" href="#Overview">&#182;</a></h3><p>In this Jupyter notebook, we explore the loss of orthogonality of modified Gram-Schmidt (MGS) and Householder orthogonalization algorithms.</p>
+<h3 id="Overview">Overview<a class="anchor-link" href="#Overview">&#182;</a></h3><p>In this Jupyter notebook, we explore the loss of orthogonality of modified Gram-Schmidt (MGS) and Householder triangularization algorithms.</p>
 <h3 id="Key-Results">Key Results<a class="anchor-link" href="#Key-Results">&#182;</a></h3><ul>
-<li><p><strong>Loss of Orthogonality</strong>. For "random matrices", both MGS and Householder orthogonalization produce $Q$ matrices where $Q' * Q - I$ is within a couple of orders of magnitude of machine precision.</p>
+<li><p><strong>Loss of Orthogonality</strong>. For "random matrices", both MGS and Householder triangularization produce $Q$ matrices where $Q' * Q - I$ is within a couple of orders of magnitude of machine precision.</p>
 <ul>
-<li><p>$|Q' * Q - I|_2$ tends to be about an order of magnitude smaller for Householder orthogonalization than for MGS.</p>
+<li><p>$|Q' * Q - I|_2$ tends to be about an order of magnitude smaller for Householder triangularization than for MGS.</p>
 </li>
-<li><p>The standard deviation of $|Q' * Q - I|_2$ tends to be about several orders of magnitude smaller for Householder orthogonalization than for MGS.</p>
+<li><p>The standard deviation of $|Q' * Q - I|_2$ tends to be about several orders of magnitude smaller for Householder triangularization than for MGS.</p>
 </li>
 </ul>
 </li>
-<li><p><strong>Accuracy of Determinant</strong>. For "random matrices", both MGS and Householder orthogonalization produce factorizations where the relative error of $\det(Q R)$ is close to machine precision.</p>
+<li><p><strong>Accuracy of Determinant</strong>. For "random matrices", both MGS and Householder triangularization produce factorizations where the relative error of $\det(Q R)$ is close to machine precision.</p>
 <ul>
 <li>The relative error of the $\det(Q R)$ is very comparable for both algorithms.</li>
 </ul>
+</li>
+</ul>
+<h3 id="Conclusions">Conclusions<a class="anchor-link" href="#Conclusions">&#182;</a></h3><ul>
+<li><p>When orthogonality of $Q$ is important, Householder triangularization should be used to compute $Q$. For even simple and small matrices, MGS can lead to significant loss of orthogonality (see Special Cases section).</p>
+</li>
+<li><p>When only the determinant of $A$ is important, both algorithms yield similar levels of accuracy.</p>
 </li>
 </ul>
 <h3 id="User-parameters">User parameters<a class="anchor-link" href="#User-parameters">&#182;</a></h3><ul>
@@ -14354,7 +14360,7 @@ a.anchor-link {
 <span class="s">&quot;&quot;&quot;</span>
 <span class="s">    Compute QR factorization of `A` using the modified Gram-Schmidt algorithm.</span>
 <span class="s">&quot;&quot;&quot;</span>
-<span class="k">function</span> <span class="n">mgs</span><span class="p">(</span><span class="n">A</span><span class="o">::</span><span class="kt">Matrix</span><span class="p">)</span>
+<span class="k">function</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="o">::</span><span class="kt">Matrix</span><span class="p">)</span>
     <span class="c"># Initialize Q and R</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">zero</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -14390,11 +14396,11 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-julia"><pre><span></span><span class="c"># --- Test mgs()</span>
+<div class=" highlight hl-julia"><pre><span></span><span class="c"># --- Test qr_mgs()</span>
 
 <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-<span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
 <span class="n">println</span><span class="p">(</span><span class="s">&quot;Relative error Q * R: &quot;</span><span class="p">,</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">Q</span> <span class="o">*</span> <span class="n">R</span><span class="p">)</span><span class="o">/</span><span class="n">opnorm</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
 <span class="n">println</span><span class="p">(</span><span class="s">&quot;Absolute error Q * R: &quot;</span><span class="p">,</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">Q</span> <span class="o">*</span> <span class="n">R</span><span class="p">))</span>
@@ -14427,14 +14433,14 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Relative error Q * R: 1.5512172131292414e-16
-Absolute error Q * R: 7.893109130154954e-16
+<pre>Relative error Q * R: 1.235430925418796e-16
+Absolute error Q * R: 7.296305761975228e-16
 opnorm(Q&#39; * Q): 1.0000000000000004
-det(A): -105.74964923539657
+det(A): -770.5772039632855
 det(Q): -1.0000000000000002
-det(R): 105.74964923539655
-Relative error det(Q * R):-0.0
-Absolute error det(Q * R):0.0
+det(R): 770.5772039632857
+Relative error det(Q * R):-5.901385981152523e-16
+Absolute error det(Q * R):4.547473508864641e-13
 </pre>
 </div>
 </div>
@@ -14468,15 +14474,14 @@ Absolute error det(Q * R):0.0
     <span class="n">det_A</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
     <span class="c"># Compute QR factorization using modified Gram-Schmidt algorithm</span>
-    <span class="n">Q_mgs</span><span class="p">,</span> <span class="n">R_mgs</span> <span class="o">=</span> <span class="n">mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">Q_mgs</span><span class="p">,</span> <span class="n">R_mgs</span> <span class="o">=</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
     <span class="n">mgs_orthogonality_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">)</span>
 
-    <span class="n">det_Q</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span>
     <span class="n">det_R</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">R_mgs</span><span class="p">)</span>
-    <span class="n">mgs_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">det_A</span> <span class="o">-</span> <span class="n">det_Q</span><span class="o">*</span><span class="n">det_R</span><span class="p">)</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
+    <span class="n">mgs_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det_R</span><span class="p">))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
     
-    <span class="c"># Compute QR factorization using Householder orthogonalization</span>
+    <span class="c"># Compute QR factorization using Householder triangularization</span>
     <span class="n">F_householder</span><span class="o">=</span> <span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="n">Q_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">Q</span>
     <span class="n">R_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">R</span>
@@ -14484,9 +14489,8 @@ Absolute error det(Q * R):0.0
     <span class="n">householder_orthogonality_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span>
         <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">)</span>
 
-    <span class="n">det_Q</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span>
     <span class="n">det_R</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">R_householder</span><span class="p">)</span>
-    <span class="n">householder_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">det_A</span> <span class="o">-</span> <span class="n">det_Q</span><span class="o">*</span><span class="n">det_R</span><span class="p">)</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
+    <span class="n">householder_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det_R</span><span class="p">))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
 <span class="k">end</span>
 </pre></div>
 
@@ -14532,10 +14536,10 @@ Absolute error det(Q * R):0.0
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>mean(mgs_orthogonality_errors): 1.3412426147818091e-14
-std(mgs_orthogonality_errors): 1.952885182137655e-13
-mean(householder_orthogonality_errors): 1.1494784356870544e-15
-std(householder_orthogonality_errors): 2.867309089479007e-16
+<pre>mean(mgs_orthogonality_errors): 4.998935256305874e-14
+std(mgs_orthogonality_errors): 3.900375254390148e-12
+mean(householder_orthogonality_errors): 1.1448650345845443e-15
+std(householder_orthogonality_errors): 2.8484152762388585e-16
 </pre>
 </div>
 </div>
@@ -14576,10 +14580,70 @@ std(householder_orthogonality_errors): 2.867309089479007e-16
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>mean(mgs_det_errors): 3.4296252431458642e-15
-std(mgs_det_errors): 5.5391668143826156e-14
-mean(householder_det_errors): 5.761934017739607e-15
-std(householder_det_errors): 7.265482161796808e-14
+<pre>mean(mgs_det_errors): 9.64652399768703e-15
+std(mgs_det_errors): 6.672712064193565e-13
+mean(householder_det_errors): 2.7625912189299647e-14
+std(householder_det_errors): 2.2140359798021072e-12
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Special-Cases">Special Cases<a class="anchor-link" href="#Special-Cases">&#182;</a></h3>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-julia"><pre><span></span><span class="c"># --- Special cases that demonstrate large loss of orthogonality with MGS</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.700000</span> <span class="mf">0.70711</span><span class="p">;</span> <span class="mf">0.70001</span> <span class="mf">0.70711</span><span class="p">]</span>
+<span class="n">det_A</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c"># MGS</span>
+<span class="n">Q_mgs</span><span class="p">,</span> <span class="n">R_mgs</span> <span class="o">=</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;MGS orthogonality error: &quot;</span><span class="p">,</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;MGS determinant error: &quot;</span><span class="p">,</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">R_mgs</span><span class="p">)))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">))</span>
+
+<span class="c"># Householder triangularization</span>
+<span class="n">F_householder</span> <span class="o">=</span> <span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">Q_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">Q</span>
+<span class="n">R_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">R</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Householder triangularization orthogonality error: &quot;</span><span class="p">,</span>
+        <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Householder triangularization determinant error: &quot;</span><span class="p">,</span>
+        <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">R_householder</span><span class="p">)))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>MGS orthogonality error: 2.3014368188967183e-11
+MGS determinant error: 6.834983657002004e-12
+Householder triangularization orthogonality error: 2.351490101248793e-16
+Householder triangularization determinant error: 5.014565377055642e-12
 </pre>
 </div>
 </div>

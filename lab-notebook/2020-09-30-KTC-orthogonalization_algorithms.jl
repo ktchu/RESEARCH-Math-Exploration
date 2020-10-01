@@ -14,7 +14,7 @@ using Statistics
 """
     Compute QR factorization of `A` using the modified Gram-Schmidt algorithm.
 """
-function mgs(A::Matrix)
+function qr_mgs(A::Matrix)
     # Initialize Q and R
     Q = copy(A)
     R = zero(A)
@@ -38,11 +38,11 @@ function mgs(A::Matrix)
     Q, R
 end;
 
-# --- Test mgs()
+# --- Test qr_mgs()
 
 n = 10
 A = randn(n, n)
-Q, R = mgs(A)
+Q, R = qr_mgs(A)
 
 println("Relative error Q * R: ", opnorm(A - Q * R)/opnorm(A))
 println("Absolute error Q * R: ", opnorm(A - Q * R))
@@ -71,15 +71,14 @@ for i in 1:num_samples
     det_A = det(A)
 
     # Compute QR factorization using modified Gram-Schmidt algorithm
-    Q_mgs, R_mgs = mgs(A)
+    Q_mgs, R_mgs = qr_mgs(A)
 
     mgs_orthogonality_errors[i] = opnorm(transpose(Q_mgs) * Q_mgs - LinearAlgebra.I)
 
-    det_Q = det(Q_mgs)
     det_R = det(R_mgs)
-    mgs_det_errors[i] = abs((det_A - det_Q*det_R) / det_A)
+    mgs_det_errors[i] = abs((abs(det_A) - abs(det_R)) / det_A)
     
-    # Compute QR factorization using Householder orthogonalization
+    # Compute QR factorization using Householder triangularization
     F_householder= qr(A)
     Q_householder = F_householder.Q
     R_householder = F_householder.R
@@ -87,9 +86,8 @@ for i in 1:num_samples
     householder_orthogonality_errors[i] =
         opnorm(transpose(Q_householder) * Q_householder - LinearAlgebra.I)
 
-    det_Q = det(Q_householder)
     det_R = det(R_householder)
-    householder_det_errors[i] = abs((det_A - det_Q*det_R) / det_A)
+    householder_det_errors[i] = abs((abs(det_A) - abs(det_R)) / det_A)
 end
 
 # --- Orthogonality Error
@@ -107,3 +105,22 @@ println("std(mgs_det_errors): ", std(mgs_det_errors))
 
 println("mean(householder_det_errors): ", mean(householder_det_errors))
 println("std(householder_det_errors): ", std(householder_det_errors))
+
+# --- Special cases that demonstrate large loss of orthogonality with MGS
+
+A = [0.700000 0.70711; 0.70001 0.70711]
+det_A = det(A)
+
+# MGS
+Q_mgs, R_mgs = qr_mgs(A)
+println("MGS orthogonality error: ", opnorm(transpose(Q_mgs) * Q_mgs - LinearAlgebra.I))
+println("MGS determinant error: ", abs((abs(det_A) - abs(det(R_mgs))) / det_A))
+
+# Householder triangularization
+F_householder = qr(A)
+Q_householder = F_householder.Q
+R_householder = F_householder.R
+println("Householder triangularization orthogonality error: ",
+        opnorm(transpose(Q_householder) * Q_householder - LinearAlgebra.I))
+println("Householder triangularization determinant error: ",
+        abs((abs(det_A) - abs(det(R_householder))) / det_A))
