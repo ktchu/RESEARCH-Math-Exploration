@@ -1,7 +1,8 @@
 # --- Project files
 
 # data directory
-data/*
+/data
+!*.dvc
 
 # log files
 *.log
@@ -9,9 +10,14 @@ data/*
 # --- Jupyter files
 
 .ipynb_checkpoints
-.jupyter/migrated
+.jupyter
+!.jupyter/jupyter_notebook_config.py
+nbconvert
 
 # --- Python files
+
+# virtual environments
+.venv
 
 # compiled source
 *.pyc
@@ -34,6 +40,9 @@ Manifest.toml
 
 # autoenv
 .env
+
+# conda
+.conda
 
 # vim
 .*.swp
