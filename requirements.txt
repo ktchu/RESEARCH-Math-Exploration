@@ -11,7 +11,7 @@ radon
 
 # Interactive environments
 ipython
-jupyter
+jupyterlab
 
 # Basic utility packages
 PyYAML
