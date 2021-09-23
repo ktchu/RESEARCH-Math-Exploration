@@ -9,11 +9,11 @@
 
 
 <style type="text/css">
-    pre { line-height: 125%; margin: 0; }
-td.linenos pre { color: #000000; background-color: #f0f0f0; padding: 0 5px 0 5px; }
-span.linenos { color: #000000; background-color: #f0f0f0; padding: 0 5px 0 5px; }
-td.linenos pre.special { color: #000000; background-color: #ffffc0; padding: 0 5px 0 5px; }
-span.linenos.special { color: #000000; background-color: #ffffc0; padding: 0 5px 0 5px; }
+    pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 .highlight .hll { background-color: var(--jp-cell-editor-active-background) }
 .highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
 .highlight .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */
@@ -14365,7 +14365,7 @@ a.anchor-link {
     <span class="n">Q</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">zero</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     
-    <span class="k">for</span> <span class="n">j</span> <span class="kp">in</span> <span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="k">in</span> <span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">norm</span> <span class="o">=</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">norm</span> <span class="o">&gt;</span> <span class="mi">0</span>
             <span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">/=</span> <span class="n">norm</span>
@@ -14375,7 +14375,7 @@ a.anchor-link {
         <span class="k">end</span>
 
         <span class="n">column</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">j_inner</span> <span class="kp">in</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j_inner</span> <span class="k">in</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">R</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j_inner</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span> <span class="n">j_inner</span><span class="p">]</span> <span class="o">⋅</span> <span class="n">column</span>
             <span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span> <span class="n">j_inner</span><span class="p">]</span> <span class="o">-=</span> <span class="n">R</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j_inner</span><span class="p">]</span> <span class="o">*</span> <span class="n">column</span>
         <span class="k">end</span>
@@ -14468,7 +14468,7 @@ Absolute error det(Q * R):4.547473508864641e-13
 <span class="n">householder_det_errors</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span>
 
 <span class="c"># Collect data</span>
-<span class="k">for</span> <span class="n">i</span> <span class="kp">in</span> <span class="mi">1</span><span class="o">:</span><span class="n">num_samples</span>
+<span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">1</span><span class="o">:</span><span class="n">num_samples</span>
     <span class="c"># Generate random matrix</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
     <span class="n">det_A</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -14476,7 +14476,7 @@ Absolute error det(Q * R):4.547473508864641e-13
     <span class="c"># Compute QR factorization using modified Gram-Schmidt algorithm</span>
     <span class="n">Q_mgs</span><span class="p">,</span> <span class="n">R_mgs</span> <span class="o">=</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-    <span class="n">mgs_orthogonality_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">)</span>
+    <span class="n">mgs_orthogonality_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 
     <span class="n">det_R</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">R_mgs</span><span class="p">)</span>
     <span class="n">mgs_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det_R</span><span class="p">))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
@@ -14487,7 +14487,7 @@ Absolute error det(Q * R):4.547473508864641e-13
     <span class="n">R_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">R</span>
     
     <span class="n">householder_orthogonality_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span>
-        <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">)</span>
+        <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 
     <span class="n">det_R</span> <span class="o">=</span> <span class="n">det</span><span class="p">(</span><span class="n">R_householder</span><span class="p">)</span>
     <span class="n">householder_det_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det_R</span><span class="p">))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">)</span>
@@ -14610,7 +14610,7 @@ std(householder_det_errors): 2.2140359798021072e-12
 
 <span class="c"># MGS</span>
 <span class="n">Q_mgs</span><span class="p">,</span> <span class="n">R_mgs</span> <span class="o">=</span> <span class="n">qr_mgs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">println</span><span class="p">(</span><span class="s">&quot;MGS orthogonality error: &quot;</span><span class="p">,</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;MGS orthogonality error: &quot;</span><span class="p">,</span> <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_mgs</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_mgs</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">I</span><span class="p">))</span>
 <span class="n">println</span><span class="p">(</span><span class="s">&quot;MGS determinant error: &quot;</span><span class="p">,</span> <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">R_mgs</span><span class="p">)))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">))</span>
 
 <span class="c"># Householder triangularization</span>
@@ -14618,7 +14618,7 @@ std(householder_det_errors): 2.2140359798021072e-12
 <span class="n">Q_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">Q</span>
 <span class="n">R_householder</span> <span class="o">=</span> <span class="n">F_householder</span><span class="o">.</span><span class="n">R</span>
 <span class="n">println</span><span class="p">(</span><span class="s">&quot;Householder triangularization orthogonality error: &quot;</span><span class="p">,</span>
-        <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="nb">I</span><span class="p">))</span>
+        <span class="n">opnorm</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">Q_householder</span><span class="p">)</span> <span class="o">*</span> <span class="n">Q_householder</span> <span class="o">-</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">I</span><span class="p">))</span>
 <span class="n">println</span><span class="p">(</span><span class="s">&quot;Householder triangularization determinant error: &quot;</span><span class="p">,</span>
         <span class="n">abs</span><span class="p">((</span><span class="n">abs</span><span class="p">(</span><span class="n">det_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">abs</span><span class="p">(</span><span class="n">det</span><span class="p">(</span><span class="n">R_householder</span><span class="p">)))</span> <span class="o">/</span> <span class="n">det_A</span><span class="p">))</span>
 </pre></div>
