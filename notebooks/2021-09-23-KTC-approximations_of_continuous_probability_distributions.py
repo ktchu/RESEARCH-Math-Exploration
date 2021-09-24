@@ -99,7 +99,7 @@ fig, ax = plt.subplots()
 ax.loglog(N_values, P_diff)
 ax.set_ylabel('|P(direct) - P(integral_preserving)|')
 ax.set_xlabel('N')
-plt.show()
+plt.show()  # suppresses matplotlib output
 
 
 # In[5]:
@@ -180,5 +180,6 @@ fig, ax = plt.subplots()
 ax.loglog(N_values, P_diff)
 ax.set_ylabel('|P(direct) - P(integral_preserving)|')
 ax.set_xlabel('N')
-plt.show()
+
+plt.show()  # suppresses matplotlib output
 
