@@ -31,7 +31,7 @@
 N_values = [5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 1000000]
 
 
-# In[ ]:
+# In[2]:
 
 
 # --- Imports
@@ -41,12 +41,23 @@ import math
 from math import exp, log
 
 # External packages
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
+# matplotlib
+get_ipython().run_line_magic('matplotlib', 'inline')
+import matplotlib.pyplot as plt
 
-# In[ ]:
+
+# In[3]:
+
+
+# --- matplotlib Configuration
+
+plt.rcParams['figure.figsize'] = [12, 6]
+
+
+# In[4]:
 
 
 # --- Gaussian distribution
@@ -84,11 +95,14 @@ for i, N in enumerate(N_values):
     P_diff[i] = max(abs(P_integral_preserving - P_direct))
     
 # Plot errors
-plt.figure()
-plt.loglog(N_values, P_diff)
+fig, ax = plt.subplots()
+ax.loglog(N_values, P_diff)
+ax.set_ylabel('|P(direct) - P(integral_preserving)|')
+ax.set_xlabel('N')
+plt.show()
 
 
-# In[ ]:
+# In[5]:
 
 
 # --- log-normal distribution
@@ -128,8 +142,11 @@ for i, N in enumerate(N_values):
     P_diff[i] = max(abs(P_integral_preserving - P_direct))
     
 # Plot errors
-plt.figure()
-plt.loglog(N_values, P_diff)
+fig, ax = plt.subplots()
+ax.loglog(N_values, P_diff)
+ax.set_ylabel('|P(direct) - P(integral_preserving)|')
+ax.set_xlabel('N')
+plt.show()
 
 # ------ Generate discrete approximations to probability distribution
 #        using a uniform grid in `log(x)`
@@ -159,6 +176,9 @@ for i, N in enumerate(N_values):
     P_diff[i] = max(abs(P_integral_preserving - P_direct))
     
 # Plot errors
-plt.figure()
-plt.loglog(N_values, P_diff)
+fig, ax = plt.subplots()
+ax.loglog(N_values, P_diff)
+ax.set_ylabel('|P(direct) - P(integral_preserving)|')
+ax.set_xlabel('N')
+plt.show()
 
