@@ -39,16 +39,16 @@ struct ThetaDistribution2D <: ContinuousUnivariateDistribution end
 Distributions.pdf(dist::ThetaDistribution2D, x::Real) = 0.5 / π
 Distributions.cdf(dist::ThetaDistribution2D, x::Real) = 0.5 * (x + π) / π
 
-dist = ThetaDistribution2D()
+theta_dist = ThetaDistribution2D()
 
 # Perform Anderson-Darling Test
-test_results = OneSampleADTest(thetas, dist)
+test_results = OneSampleADTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ExactOneSampleKSTest(thetas, dist)
+test_results = ExactOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ApproximateOneSampleKSTest(thetas, dist)
+test_results = ApproximateOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
 # --- Generate sample of vectors drawn from a uniform distribution on a unit circle
@@ -86,16 +86,16 @@ struct ThetaDistribution2D <: ContinuousUnivariateDistribution end
 Distributions.pdf(dist::ThetaDistribution2D, x::Real) = 0.5 / π
 Distributions.cdf(dist::ThetaDistribution2D, x::Real) = 0.5 * (x + π) / π
 
-dist = ThetaDistribution2D()
+theta_dist = ThetaDistribution2D()
 
 # Perform Anderson-Darling Test
-test_results = OneSampleADTest(thetas, dist)
+test_results = OneSampleADTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ExactOneSampleKSTest(thetas, dist)
+test_results = ExactOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ApproximateOneSampleKSTest(thetas, dist)
+test_results = ApproximateOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
 # --- Generate sample of vectors drawn from a uniform distribution on a unit sphere
@@ -132,16 +132,16 @@ display(plt)
 struct ThetaDistribution3D <: ContinuousUnivariateDistribution end
 Distributions.cdf(dist::ThetaDistribution3D, x::Real) = 0.5 * (1 - cos(x))
 
-dist = ThetaDistribution3D()
+theta_dist = ThetaDistribution3D()
 
 # Perform Anderson-Darling Test
-test_results = OneSampleADTest(thetas, dist)
+test_results = OneSampleADTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ExactOneSampleKSTest(thetas, dist)
+test_results = ExactOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ApproximateOneSampleKSTest(thetas, dist)
+test_results = ApproximateOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
 # --- Generate sample of vectors drawn from a uniform distribution on a unit sphere
@@ -191,16 +191,16 @@ function Distributions.cdf(dist::ThetaDistributionND, x::Real)
     return value
 end
 
-dist = ThetaDistributionND()
+theta_dist = ThetaDistributionND()
 
 # Perform Anderson-Darling Test
-test_results = OneSampleADTest(thetas, dist)
+test_results = OneSampleADTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ExactOneSampleKSTest(thetas, dist)
+test_results = ExactOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ApproximateOneSampleKSTest(thetas, dist)
+test_results = ApproximateOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
 # --- Generate sample of vectors drawn from a uniform distribution on a unit sphere
@@ -251,14 +251,14 @@ function Distributions.cdf(dist::ThetaDistributionND, x::Real)
     return value
 end
 
-dist = ThetaDistributionND()
+theta_dist = ThetaDistributionND()
 
 # Perform Anderson-Darling Test
-test_results = OneSampleADTest(thetas, dist)
+test_results = OneSampleADTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ExactOneSampleKSTest(thetas, dist)
+test_results = ExactOneSampleKSTest(thetas, theta_dist)
 println(test_results)
 
-test_results = ApproximateOneSampleKSTest(thetas, dist)
+test_results = ApproximateOneSampleKSTest(thetas, theta_dist)
 println(test_results)
