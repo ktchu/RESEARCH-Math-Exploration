@@ -186,7 +186,7 @@ function Distributions.cdf(dist::ThetaDistributionND, x::Real)
     end
     value *= 2
     value += sgn * binomial(k, k÷2) * x  # contribution from i = k÷2 term
-    value *= sgn / π / binomial(k, k ÷ 2)
+    value *= sgn / π / binomial(k, k÷2)
 
     return value
 end
