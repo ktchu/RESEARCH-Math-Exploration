@@ -10,20 +10,12 @@ using Random
 # --- Generate sample of vectors drawn from a uniform distribution on a unit circle
 
 n = 2
-num_samples_2d = 10000
+num_samples_2d = 50000
 
-# Generate vectors
-dist = MvNormal(zeros(n), ones(n))
+dist = Uniform(-π, π)
 num_vectors = num_samples_2d
-vectors = rand(dist, num_vectors)
-for i = 1:num_vectors
-    vectors[:, i] /= norm(vectors[:, i])
-end
-
-# dist = Uniform(-π, π)
-# num_vectors = num_samples_2d
-# theta = rand(dist, num_vectors)
-# vectors = transpose(hcat(cos.(theta), sin.(theta)))
+theta = rand(dist, num_vectors)
+vectors = transpose(hcat(cos.(theta), sin.(theta)))
 
 # --- Plot histogram of angles
 
@@ -34,8 +26,55 @@ hist_bins = range(-pi, pi; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
-expected_pdf_2d = 0.5 / π
-println("Expected density: $(expected_pdf_2d)")
+pdf_2d = 0.5 / π
+println("pdf(θ): $(pdf_2d)")
+
+# Display plot
+display(plt)
+
+# --- Perform test for uniformity on the circle
+
+# Analytical formula for distribution over angle from x-axis
+struct ThetaDistribution2D <: ContinuousUnivariateDistribution end
+Distributions.pdf(dist::ThetaDistribution2D, x::Real) = 0.5 / π
+Distributions.cdf(dist::ThetaDistribution2D, x::Real) = 0.5 * (x + π) / π
+
+dist = ThetaDistribution2D()
+
+# Perform Anderson-Darling Test
+test_results = OneSampleADTest(thetas, dist)
+println(test_results)
+
+test_results = ExactOneSampleKSTest(thetas, dist)
+println(test_results)
+
+test_results = ApproximateOneSampleKSTest(thetas, dist)
+println(test_results)
+
+# --- Generate sample of vectors drawn from a uniform distribution on a unit circle
+
+n = 2
+num_samples_2d = 50000
+
+# Generate vectors
+dist = MvNormal(zeros(n), ones(n))
+num_vectors = num_samples_2d
+vectors = rand(dist, num_vectors)
+for i = 1:num_vectors
+    vectors[:, i] /= norm(vectors[:, i])
+end
+
+# --- Plot histogram of angles
+
+thetas = map(i -> atan(vectors[:, i][2], vectors[:, i][1]), 1:num_vectors)
+
+num_hist_bins = 25
+hist_bins = range(-pi, pi; length=num_hist_bins)
+hist = histogram(thetas; bins=hist_bins, normalize=true)
+plt = plot(hist)
+
+pdf_2d = 0.5 / π
+println("pdf(θ): $(pdf_2d)")
 
 # Display plot
 display(plt)
@@ -81,8 +120,8 @@ hist_bins = range(0, π; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
-expected_pdf_3d(x) = 0.5 * sin(x)
-plt = plot!(expected_pdf_3d, 0, π)
+pdf_3d(x) = 0.5 * sin(x)
+plt = plot!(pdf_3d, 0, π)
 
 # Display plot
 display(plt)
@@ -127,8 +166,8 @@ hist_bins = range(0, π; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
-expected_pdf_nd(x) = (2^(n-2) / π / binomial(n-2, (n-2) ÷ 2)) * sin(x)^(n-2)
-plt = plot!(expected_pdf_nd, 0, π)
+pdf_nd(x) = (2^(n-2) / π / binomial(n-2, (n-2) ÷ 2)) * sin(x)^(n-2)
+plt = plot!(pdf_nd, 0, π)
 
 # Display plot
 display(plt)
@@ -186,8 +225,8 @@ hist_bins = range(0, π; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
-expected_pdf_nd(x) = (2^(n-2) / π / binomial(n-2, (n-2) ÷ 2)) * sin(x)^(n-2)
-plt = plot!(expected_pdf_nd, 0, π)
+pdf_nd(x) = (2^(n-2) / π / binomial(n-2, (n-2) ÷ 2)) * sin(x)^(n-2)
+plt = plot!(pdf_nd, 0, π)
 
 # Display plot
 display(plt)
