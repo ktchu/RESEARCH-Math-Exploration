@@ -1,7 +1,7 @@
 # --- User Parameters
 
 # Number of samples to use to estimate probability distributions
-num_samples = 1000;
+sample_size = 10000;
 
 # --- Imports
 
@@ -18,75 +18,159 @@ using StatsBase
 # ------ Uniformity test parameters
 
 # p-value cutoff
-p_value_cutoff = 0.1
+p_value_cutoff = 0.1;
 
 # maximum number of attempts to generate a sample of vectors
-max_attempts = 10
+max_attempts = 10;
 
-# --- Generate sample of vectors drawn from a uniform distribution on a unit circle
+# --- Probability distribution for θ (angle between vector and x_1-axis)
+
+struct ThetaDistribution <: ContinuousUnivariateDistribution
+    n::Integer
+end
+
+function Distributions.cdf(dist::ThetaDistribution, x::Real)
+    # Preparations
+    k = dist.n-2
+
+    # Compute pdf
+    value = 0
+    if k % 2 == 0
+        # Precompute re-used coefficients
+        sgn = (-1)^(k÷2)
+        k_choose_k_over_2 = binomial(big(k), k÷2)
+        
+        for j = 0:(k÷2 - 1)
+            value += (-1)^j * binomial(big(k), j) * sin((k - 2*j) * x) / (k - 2*j)
+        end
+        value *= 2
+        value += sgn * k_choose_k_over_2 * x  # contribution from i = k÷2 term
+        value *= sgn / π / k_choose_k_over_2
+
+    else
+        normalization = 0
+        for j = 0:(k-1)÷2
+            
+            coef = (-1)^j * binomial(big(k), j) * (1 / (k - 2*j) - 1 / (2*j - k))
+            value += coef * (1 - cos((k - 2*j) * x))
+            normalization += coef
+        end
+        normalization = 0.5 / normalization
+        value *= normalization
+
+    end
+
+    return value
+end
+
+# --- Tests
+
+# 2D: cdf(x) = x / π
+theta_dist_2d = ThetaDistribution(2)
+for x = range(0, π; length=10)
+    computed_cdf = cdf(theta_dist_2d, x)
+    expected_cdf = x / π
+    @assert (computed_cdf ≈ expected_cdf) "Expected: $(expected_cdf). Got: $(computed_cdf)"
+end
+
+# 3D: cdf(x) = 0.5 * (1 - cos(x))
+theta_dist_3d = ThetaDistribution(3)
+for x = range(0, π; length=10)
+    computed_cdf = cdf(theta_dist_3d, x)
+    expected_cdf = 0.5 * (1 - cos(x))
+    @assert (computed_cdf ≈ expected_cdf) "Expected: $(expected_cdf). Got: $(computed_cdf)"
+end
+
+function generate_vectors(n::Integer, s::Integer, sample_size::Integer)::Tuple
+    """
+    Generate a sample of s-dimensional blades in an n-dimensional space where each blade
+    is defined by unit vectors drawn from a uniform distribution over the surface of an
+    unit n-sphere.
+
+    Parameters
+    ----------
+    n: dimension of space
+
+    s: grade of blades
+
+    sample_size: number of blades to include in sample
+    
+    Return values
+    -------------
+    vectors: sample of vectors
+    
+    uniformity_stats: results of tests for uniformity of sample on unit n-sphere
+    """
+    # --- Set up uniformity tests
+
+    theta_dist = ThetaDistribution(n)
+    AD_p_value = 0
+    KS_p_value = 0
+
+    # --- Generate sample of vectors
+
+    num_attempts = 0
+    vectors = undef
+    while ( ((AD_p_value < p_value_cutoff) || (KS_p_value < p_value_cutoff)) &&
+            (num_attempts < max_attempts) )
+
+        # Generate new sample
+        dist = MvNormal(zeros(n), ones(n))
+        num_vectors = sample_size * s
+        vectors = rand(dist, num_vectors)
+        for i = 1:num_vectors
+            vectors[:, i] /= norm(vectors[:, i])
+        end
+
+        # Perform test for uniformity on unit n-sphere
+        thetas = map(i -> atan(norm(vectors[:, i][2:end]), vectors[:, i][1]), 1:num_vectors)
+
+        # Anderson-Darling Test
+        AD_p_value = pvalue(OneSampleADTest(thetas, theta_dist))
+
+        # Kolmogorov-Smirnov Test
+        KS_p_value = pvalue(ExactOneSampleKSTest(thetas, theta_dist))
+
+        # Update attempt count
+        num_attempts += 1
+    end
+
+    # --- Display uniformity test results
+
+    uniformity_stats = (
+        success=(num_attempts < max_attempts),
+        num_attempts=num_attempts,
+        AD_p_value=AD_p_value,
+        KS_p_value=KS_p_value,
+    )
+    
+    return vectors, uniformity_stats
+end
+
+# --- Generate blade sample
 
 # Dimension of space
 n_2d = 2;
 
-# Blade dimension
-m = 2;
-
-# Set up uniformity tests
-struct ThetaDistribution2D <: ContinuousUnivariateDistribution end
-Distributions.cdf(dist::ThetaDistribution2D, x::Real) = 0.5 * (x + π) / π
-theta_dist = ThetaDistribution2D()
-AD_p_value = 0
-KS_p_value = 0
+# Grade of blades
+s = 2;
 
 # Generate sample of vectors
-count = 0
-vectors = undef
-while ( ((AD_p_value < p_value_cutoff) || (KS_p_value < p_value_cutoff)) &&
-        (count < max_attempts) )
-    
-    # Generate new sample
-    dist = MvNormal(zeros(n_2d), ones(n_2d))
-    num_vectors = num_samples * m
-    vectors = rand(dist, num_vectors)
-    for i = 1:num_vectors
-        vectors[:, i] /= norm(vectors[:, i])
-    end
-
-    # Perform test for uniformity on unit circle
-    thetas = map(i -> atan(vectors[:, i][2], vectors[:, i][1]), 1:num_vectors)
-
-    # Anderson-Darling Test
-    AD_p_value = pvalue(OneSampleADTest(thetas, theta_dist))
-
-    # Kolmogorov-Smirnov Test
-    KS_p_value = pvalue(ExactOneSampleKSTest(thetas, theta_dist))
-    
-    # Update count
-    count += 1
+vectors, uniformity_stats = generate_vectors(n_2d, s, sample_size)
+if !uniformity_stats[:success]
+    println("FAILED to generated sample with sufficient uniformity on unit circle.")
+    display(uniformity_stats)
 end
-
-# Display uniformity test results
-if count < max_attempts
-    println("Successfully generated sample")
-    println("Samples generated to pass tests: $count")
-    println("AD p-value: $AD_p_value")
-    println("KS p-value: $KS_p_value")
-else
-    println("FAILED to generated sample with sufficient uniformity on unit circle")
-end
-
-# --- Generate sample of blades
 
 # Group vectors into blades
 blades = []
-for i = 1:num_samples
-    push!(blades, vectors[:, (i-1)*m+1:i*m])
+for i = 1:sample_size
+    push!(blades, vectors[:, (i-1)*s+1:i*s])
 end
 
-# --- Compute blade volumes
-
+# Compute blade volumes
 signed_volumes = Vector{Float64}()
-for i = 1:num_samples
+for i = 1:sample_size
     F = qr(blades[i])
     signed_volume = det(F.R)
     push!(signed_volumes, signed_volume)
@@ -94,7 +178,7 @@ end
 
 volumes = abs.(signed_volumes);
 
-# --- Generate volume distributions
+# --- Generate blade volume distributions
 
 # Histogram parameters
 num_hist_bins = 50
@@ -121,65 +205,25 @@ edf = normalize(hist; mode=:pdf);
 # Dimension of space
 n_3d = 3;
 
-# Blade dimension
-m = 2;
-
-# Set up uniformity tests
-struct ThetaDistribution3D <: ContinuousUnivariateDistribution end
-Distributions.cdf(dist::ThetaDistribution3D, x::Real) = 0.5 * (1 - cos(x))
-theta_dist = ThetaDistribution3D()
-AD_p_value = 0
-KS_p_value = 0
+# Grade of blades
+s = 2;
 
 # Generate sample of vectors
-count = 0
-vectors = undef
-while ( ((AD_p_value < p_value_cutoff) || (KS_p_value < p_value_cutoff)) &&
-        (count < max_attempts) )
-    
-    # Generate new sample
-    dist = MvNormal(zeros(n_3d), ones(n_3d))
-    num_vectors = num_samples * m
-    vectors = rand(dist, num_vectors)
-    for i = 1:num_vectors
-        vectors[:, i] /= norm(vectors[:, i])
-    end
-
-    # Perform test for uniformity on unit circle
-    thetas = map(i -> atan(norm(vectors[:, i][2:end]), vectors[:, i][1]), 1:num_vectors)
-
-    # Anderson-Darling Test
-    AD_p_value = pvalue(OneSampleADTest(thetas, theta_dist))
-
-    # Kolmogorov-Smirnov Test
-    KS_p_value = pvalue(ExactOneSampleKSTest(thetas, theta_dist))
-    
-    # Update count
-    count += 1
+vectors, uniformity_stats = generate_vectors(n_3d, s, sample_size)
+if !uniformity_stats[:success]
+    println("FAILED to generated sample with sufficient uniformity on unit sphere.")
+    display(uniformity_stats)
 end
-
-# Display uniformity test results
-if count < max_attempts
-    println("Successfully generated sample")
-    println("Samples generated to pass tests: $count")
-    println("AD p-value: $AD_p_value")
-    println("KS p-value: $KS_p_value")
-else
-    println("FAILED to generated sample with sufficient uniformity on unit sphere")
-end
-
-# --- Generate sample of blades
 
 # Group vectors into blades
 blades = []
-for i = 1:num_samples
-    push!(blades, vectors[:, (i-1)*m+1:i*m])
+for i = 1:sample_size
+    push!(blades, vectors[:, (i-1)*s+1:i*s])
 end
 
-# --- Compute blade volumes
-
+# Compute blade volumes
 signed_volumes = Vector{Float64}()
-for i = 1:num_samples
+for i = 1:sample_size
     F = qr(blades[i])
     signed_volume = det(F.R)
     push!(signed_volumes, signed_volume)
@@ -187,7 +231,7 @@ end
 
 volumes = abs.(signed_volumes);
 
-# --- Generate volume distributions
+# --- Generate blade volume distributions
 
 # Histogram parameters
 num_hist_bins = 50
@@ -214,94 +258,25 @@ edf = normalize(hist; mode=:pdf);
 # Dimension of space
 n = 100;
 
-# Blade dimension
-m = 2;
-
-# Set up uniformity tests
-struct ThetaDistributionND <: ContinuousUnivariateDistribution end
-if n % 2 == 0
-    function Distributions.cdf(dist::ThetaDistributionND, x::Real)
-        k = n-2
-        sgn = (-1)^(k÷2)
-        value = 0
-        for j = 0:(k÷2 - 1)
-            value += (-1)^j * binomial(big(k), j) * sin((k - 2*j) * x) / (k - 2*j)
-        end
-        value *= 2
-        value += sgn * binomial(big(k), k÷2) * x  # contribution from i = k÷2 term
-        value *= sgn / π / binomial(big(k), k÷2)
-
-        return value
-    end
-else
-    function Distributions.cdf(dist::ThetaDistributionND, x::Real)
-        k = n-2
-        value = 0
-        normalization = 0
-        for j = 0:k
-            coef = (-1)^j * binomial(big(k), j) / (k - 2*j)
-            value += coef * (1 - cos((k - 2*j) * x))
-            normalization += coef
-        end
-        normalization = 0.5 / normalization
-        value *= normalization
-
-        return value
-    end
-end
-theta_dist = ThetaDistributionND()
-AD_p_value = 0
-KS_p_value = 0
+# Grade of blades
+s = 10;
 
 # Generate sample of vectors
-count = 0
-vectors = undef
-while ( ((AD_p_value < p_value_cutoff) || (KS_p_value < p_value_cutoff)) &&
-        (count < max_attempts) )
-    
-    # Generate new sample
-    dist = MvNormal(zeros(n), ones(n))
-    num_vectors = num_samples * m
-    vectors = rand(dist, num_vectors)
-    for i = 1:num_vectors
-        vectors[:, i] /= norm(vectors[:, i])
-    end
-
-    # Perform test for uniformity on unit circle
-    thetas = map(i -> atan(norm(vectors[:, i][2:end]), vectors[:, i][1]), 1:num_vectors)
-
-    # Anderson-Darling Test
-    AD_p_value = pvalue(OneSampleADTest(thetas, theta_dist))
-
-    # Kolmogorov-Smirnov Test
-    KS_p_value = pvalue(ExactOneSampleKSTest(thetas, theta_dist))
-    
-    # Update count
-    count += 1
+vectors, uniformity_stats = generate_vectors(n, s, sample_size)
+if !uniformity_stats[:success]
+    println("FAILED to generated sample with sufficient uniformity on unit $(n)-sphere.")
+    display(uniformity_stats)
 end
-
-# Display uniformity test results
-if count < max_attempts
-    println("Successfully generated sample")
-    println("Samples generated to pass tests: $count")
-    println("AD p-value: $AD_p_value")
-    println("KS p-value: $KS_p_value")
-else
-    println("FAILED to generated sample with sufficient uniformity on unit hypersphere")
-end
-
-# --- Generate sample of blades
 
 # Group vectors into blades
 blades = []
-for i = 1:num_samples
-    push!(blades, vectors[:, (i-1)*m+1:i*m])
+for i = 1:sample_size
+    push!(blades, vectors[:, (i-1)*s+1:i*s])
 end
 
-# --- Compute blade volumes
-
+# Compute blade volumes
 signed_volumes = Vector{Float64}()
-for i = 1:num_samples
+for i = 1:sample_size
     F = qr(blades[i])
     signed_volume = det(F.R)
     push!(signed_volumes, signed_volume)
