@@ -79,7 +79,7 @@ for x = range(0, π; length=10)
     @assert (computed_cdf ≈ expected_cdf) "Expected: $(expected_cdf). Got: $(computed_cdf)"
 end
 
-function generate_vectors(n::Integer, s::Integer, sample_size::Integer)::Tuple
+function generate_blades(n::Integer, s::Integer, sample_size::Integer)::Tuple
     """
     Generate a sample of s-dimensional blades in an n-dimensional space where each blade
     is defined by unit vectors drawn from a uniform distribution over the surface of an
@@ -133,7 +133,14 @@ function generate_vectors(n::Integer, s::Integer, sample_size::Integer)::Tuple
         num_attempts += 1
     end
 
-    # --- Display uniformity test results
+    # --- Group vectors into blades
+
+    blades = []
+    for i = 1:sample_size
+        push!(blades, vectors[:, (i-1)*s+1:i*s])
+    end
+
+    # --- Save uniformity test results
 
     uniformity_stats = (
         success=(num_attempts < max_attempts),
@@ -142,30 +149,22 @@ function generate_vectors(n::Integer, s::Integer, sample_size::Integer)::Tuple
         KS_p_value=KS_p_value,
     )
     
-    return vectors, uniformity_stats
+    return blades, uniformity_stats
 end
 
-# --- Generate blade sample
+# --- Generate blades
 
-# Dimension of space
-n_2d = 2;
+# Parameters
+n_2d = 2;  # dimension of space
+s = 2;  # grade of blades
 
-# Grade of blades
-s = 2;
-
-# Generate sample of vectors
-vectors, uniformity_stats = generate_vectors(n_2d, s, sample_size)
+# Generate sample of blades
+blades, uniformity_stats = generate_blades(n_2d, s, sample_size)
 if !uniformity_stats[:success]
     println("FAILED to generated sample with sufficient uniformity on unit circle.")
     display(uniformity_stats)
 end
 
-# Group vectors into blades
-blades = []
-for i = 1:sample_size
-    push!(blades, vectors[:, (i-1)*s+1:i*s])
-end
-
 # Compute blade volumes
 signed_volumes = Vector{Float64}()
 for i = 1:sample_size
@@ -198,27 +197,19 @@ edf_signed = normalize(hist_signed; mode=:pdf);
 hist = fit(Histogram, volumes; nbins=num_hist_bins)
 edf = normalize(hist; mode=:pdf);
 
-# --- Generate blade sample
+# --- Generate blades
 
-# Dimension of space
-n_3d = 3;
+# Parameters
+n_3d = 3;  # dimension of space
+s = 2;  # grade of blades
 
-# Grade of blades
-s = 2;
-
-# Generate sample of vectors
-vectors, uniformity_stats = generate_vectors(n_3d, s, sample_size)
+# Generate sample of blades
+blades, uniformity_stats = generate_blades(n_3d, s, sample_size)
 if !uniformity_stats[:success]
     println("FAILED to generated sample with sufficient uniformity on unit sphere.")
     display(uniformity_stats)
 end
 
-# Group vectors into blades
-blades = []
-for i = 1:sample_size
-    push!(blades, vectors[:, (i-1)*s+1:i*s])
-end
-
 # Compute blade volumes
 signed_volumes = Vector{Float64}()
 for i = 1:sample_size
@@ -251,25 +242,17 @@ edf_signed = normalize(hist_signed; mode=:pdf);
 hist = fit(Histogram, volumes; nbins=num_hist_bins)
 edf = normalize(hist; mode=:pdf);
 
-# --- Generate blade sample
+# --- Generate blades
 
-# Dimension of space
-n = 100;
-
-# Grade of blades
-s = 10;
+# Parameters
+n = 100;  # dimension of space
+s = 10;  # grade of blades
 
 # Generate sample of vectors
-vectors, uniformity_stats = generate_vectors(n, s, sample_size)
+blades, uniformity_stats = generate_blades(n, s, sample_size)
 if !uniformity_stats[:success]
     println("FAILED to generated sample with sufficient uniformity on unit $(n)-sphere.")
     display(uniformity_stats)
-end
-
-# Group vectors into blades
-blades = []
-for i = 1:sample_size
-    push!(blades, vectors[:, (i-1)*s+1:i*s])
 end
 
 # Compute blade volumes
