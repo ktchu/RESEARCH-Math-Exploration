@@ -6,12 +6,12 @@ sample_size = 10000;
 # --- Imports
 
 import Distributions
-using Distributions: MvNormal, Uniform, ContinuousUnivariateDistribution, cdf, pdf
+using Distributions: MvNormal, ContinuousUnivariateDistribution, cdf
 using HypothesisTests
 using LinearAlgebra
 using Plots
 using Random
-using StatsBase
+using StatsBase: Histogram, fit
 
 # --- Internal Parameters
 
@@ -48,15 +48,13 @@ function Distributions.cdf(dist::ThetaDistribution, x::Real)
         value *= sgn / π / k_choose_k_over_2
 
     else
-        normalization = 0
+        norm_ = 0
         for j = 0:(k-1)÷2
-            
-            coef = (-1)^j * binomial(big(k), j) * (1 / (k - 2*j) - 1 / (2*j - k))
+            coef = (-1)^j * binomial(big(k), j) / (k - 2*j)
             value += coef * (1 - cos((k - 2*j) * x))
-            normalization += coef
+            norm_ += coef
         end
-        normalization = 0.5 / normalization
-        value *= normalization
+        value /= 2 * norm_
 
     end
 
