@@ -198,7 +198,7 @@ edf_signed = normalize(hist_signed; mode=:pdf);
 hist = fit(Histogram, volumes; nbins=num_hist_bins)
 edf = normalize(hist; mode=:pdf);
 
-# --- Generate sample of vectors drawn from a uniform distribution on a unit sphere
+# --- Generate blade sample
 
 # Dimension of space
 n_3d = 3;
@@ -251,7 +251,7 @@ edf_signed = normalize(hist_signed; mode=:pdf);
 hist = fit(Histogram, volumes; nbins=num_hist_bins)
 edf = normalize(hist; mode=:pdf);
 
-# --- Generate sample of vectors drawn from a uniform distribution on a unit hypersphere
+# --- Generate blade sample
 
 # Dimension of space
 n = 100;
