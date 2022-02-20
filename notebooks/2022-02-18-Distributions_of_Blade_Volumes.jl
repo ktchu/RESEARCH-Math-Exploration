@@ -165,7 +165,8 @@ if !uniformity_stats[:success]
     display(uniformity_stats)
 end
 
-# Compute blade volumes
+# --- Compute blade volumes
+
 signed_volumes = Vector{Float64}()
 for i = 1:sample_size
     F = qr(blades[i])
@@ -210,7 +211,8 @@ if !uniformity_stats[:success]
     display(uniformity_stats)
 end
 
-# Compute blade volumes
+# --- Compute blade volumes
+
 signed_volumes = Vector{Float64}()
 for i = 1:sample_size
     F = qr(blades[i])
@@ -255,7 +257,8 @@ if !uniformity_stats[:success]
     display(uniformity_stats)
 end
 
-# Compute blade volumes
+# --- Compute blade volumes
+
 signed_volumes = Vector{Float64}()
 for i = 1:sample_size
     F = qr(blades[i])
