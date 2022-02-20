@@ -1,51 +1,79 @@
-# --- Project files
+# --- Data
 
 # data directory
 /data
+
+# DVC files
 !*.dvc
 
-# log files
-*.log
+# --- Python
 
-# --- Jupyter files
+# compiled code
+__pycache__/
+*.py[cod]
 
-.ipynb_checkpoints
-.jupyter
-!.jupyter/jupyter_notebook_config.py
-nbconvert
-
-# --- Python files
-
-# virtual environments
-.venv
-
-# compiled source
-*.pyc
+# setuptools
+/dist/
+*.egg-info/
+*.egg*
 
 # testing
+htmlcov/
 .cache
 .coverage
 .coverage.*
 .pytest_cache
+.tox/
 
-# --- Julia files
+# pdoc auto-generated documentation
+docs/api
+
+# DotEnv configuration
+.env
+
+# --- Julia
 
 Manifest.toml
 
-# --- Miscellaneous
+# --- Compiled code
+
+# shared objects
+*.so
+
+# --- Jupyter
+
+.ipynb_checkpoints/
+.jupyter
+!.jupyter/jupyter_notebook_config.py
+nbconvert
+
+# --- Code editors
+
+# VS Code
+.vscode/
+
+# Pycharm
+.idea
+
+# Spyder
+.spyproject/
+
+# vim
+*.sw[po]
+
+# --- Environments
 
 # direnv
 .direnv
 .envrc
 
-# autoenv
-.env
-
 # conda
 .conda
 
-# vim
-.*.swp
+# --- Miscellaneous
+
+# Log files
+*.log
 
 # macOS
-.DS_Store*
+.DS_Store
