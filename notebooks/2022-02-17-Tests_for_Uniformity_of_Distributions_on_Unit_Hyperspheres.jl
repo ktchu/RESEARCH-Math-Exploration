@@ -15,14 +15,14 @@ num_samples_2d = 50000
 dist = Uniform(-π, π)
 num_vectors = num_samples_2d
 theta = rand(dist, num_vectors)
-vectors = transpose(hcat(cos.(theta), sin.(theta)))
+vectors = transpose(hcat(cos.(theta), sin.(theta)));
 
 # --- Plot histogram of angles
 
 thetas = map(i -> atan(vectors[:, i][2], vectors[:, i][1]), 1:num_vectors)
 
 num_hist_bins = 25
-hist_bins = range(-pi, pi; length=num_hist_bins)
+hist_bins = range(-π, π; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
@@ -66,14 +66,14 @@ end
 
 # --- Plot histogram of angles
 
-thetas = map(i -> atan(vectors[:, i][2], vectors[:, i][1]), 1:num_vectors)
+thetas = map(i -> atan(norm(vectors[:, i][2]), vectors[:, i][1]), 1:num_vectors)
 
 num_hist_bins = 25
-hist_bins = range(-pi, pi; length=num_hist_bins)
+hist_bins = range(0, π; length=num_hist_bins)
 hist = histogram(thetas; bins=hist_bins, normalize=true)
 plt = plot(hist)
 
-pdf_2d = 0.5 / π
+pdf_2d = 1 / π
 println("pdf(θ): $(pdf_2d)")
 
 # Display plot
@@ -83,8 +83,8 @@ display(plt)
 
 # Analytical formula for distribution over angle from x-axis
 struct ThetaDistribution2D <: ContinuousUnivariateDistribution end
-Distributions.pdf(dist::ThetaDistribution2D, x::Real) = 0.5 / π
-Distributions.cdf(dist::ThetaDistribution2D, x::Real) = 0.5 * (x + π) / π
+Distributions.pdf(dist::ThetaDistribution2D, x::Real) = 1 / π
+Distributions.cdf(dist::ThetaDistribution2D, x::Real) = x / π
 
 theta_dist = ThetaDistribution2D()
 
@@ -239,14 +239,13 @@ struct ThetaDistributionND <: ContinuousUnivariateDistribution end
 function Distributions.cdf(dist::ThetaDistributionND, x::Real)
     k = n-2
     value = 0
-    normalization = 0
-    for j = 0:k
+    norm_ = 0
+    for j = 0:(k-1)÷2
         coef = (-1)^j * binomial(k, j) / (k - 2*j)
         value += coef * (1 - cos((k - 2*j) * x))
-        normalization += coef
+        norm_ += coef
     end
-    normalization = 0.5 / normalization
-    value *= normalization
+    value /= 2 * norm_
 
     return value
 end
