@@ -176,7 +176,7 @@ end
 
 volumes = abs.(signed_volumes);
 
-# --- Generate blade volume distributions
+# --- Compute distributions
 
 # Histogram parameters
 num_hist_bins = 50
@@ -222,7 +222,7 @@ end
 
 volumes = abs.(signed_volumes);
 
-# --- Generate blade volume distributions
+# --- Compute distributions
 
 # Histogram parameters
 num_hist_bins = 50
@@ -268,7 +268,7 @@ end
 
 volumes = abs.(signed_volumes);
 
-# --- Generate volume distributions
+# --- Compute distributions
 
 # Histogram parameters
 num_hist_bins = 50
