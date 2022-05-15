@@ -3,8 +3,6 @@
 
 # ## 2020-07-01: Exploring the Probability Distribution of Exponential Moving Averages (EMAs)
 # 
-# *Last Updated*: 2020-07-04
-# 
 # ### Authors
 # * Kevin Chu (kevin@velexi.com)
 # 
@@ -44,6 +42,14 @@
 # * `num_ensemble_samples`: number of time series to include in the ensemble
 # * `pdf`: probability distribution function of data samples
 
+# ### History
+# 
+# #### 2022-05-14
+# - Replaced `seaborn.distplot()` with `seaborn.histplot()` because `distplot()` has been deprecated.
+# 
+# #### 2020-07-04
+# - Near-initial version.
+
 # In[1]:
 
 
@@ -68,6 +74,7 @@ pdf = 'uniform'
 import time
 
 # External packages
+import matplotlib.pyplot as plt
 import numba
 from numba import jit
 import numpy as np
@@ -147,6 +154,7 @@ print("Runtime 'compute_ema()' (after compilation): {:.3g}s"
 # --- Preparations
 
 # Seaborn configuration
+figsize = (15, 8)
 sns.set(color_codes=True)
 
 
@@ -177,7 +185,8 @@ print("E[X]: {:.3g}".format(x_mean))
 print("Var[X]: {:.3g}".format(x_var))
 
 # Plot probability distribution
-sns.distplot(x[0,:])
+plt.figure(figsize=figsize)
+sns.histplot(x[0,:], stat='density', kde=True)
 
 
 # ### Probability distribution of final EMA values for a large $\alpha$ value
@@ -205,10 +214,11 @@ print("Var[EMA]: {:.3g}".format(ema_final.var()))
 print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 
 # Visualize distribution at end time
-sns.distplot(ema_final)
+plt.figure(figsize=figsize)
+sns.histplot(ema_final, stat='density', kde=True)
 
 # Compare with distribution for X
-sns.kdeplot(x[0,:])
+sns.kdeplot(x[0,:], color='orange')
 
 
 # ### Probability distribution of EMA values within a single time series for large $\alpha$ value
@@ -235,10 +245,11 @@ print("Var[EMA]: {:.3g}".format(ema_var))
 print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 
 # Visualize distribution of time series values
-sns.distplot(ema_time_series)
+plt.figure(figsize=figsize)
+sns.histplot(ema_time_series, stat='density', kde=True)
 
 # Compare with distribution for X
-sns.kdeplot(x[0,:])
+sns.kdeplot(x[0,:], color='orange')
 
 
 # ### Probability distribution of final EMA values for medium $\alpha$ value
@@ -268,11 +279,12 @@ print("Var[EMA]: {:.3g}".format(ema_var))
 print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 
 # Visualize distribution of final EMA values
-sns.distplot(ema_final)
+plt.figure(figsize=figsize)
+sns.histplot(ema_final, stat='density', kde=True)
 
 # Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
 g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
+sns.kdeplot(g, color='orange')
 
 
 # ### Probability distribution of EMA values within a single time series for medium $\alpha$ value
@@ -299,11 +311,12 @@ print("Var[EMA]: {:.3g}".format(ema_var))
 print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 
 # Visualize distribution of time series values
-sns.distplot(ema_time_series)
+plt.figure(figsize=figsize)
+sns.histplot(ema_time_series, stat='density', kde=True)
 
 # Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
 g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
+sns.kdeplot(g, color='orange')
 
 
 # ### Probability distribution of final EMA values for a small $\alpha$ value
@@ -334,11 +347,12 @@ print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 print("Approximate Asymptotic Var[EMA]: {:.3g}".format(alpha / 2 * x_var))
 
 # Visualize distribution of final EMA values
-sns.distplot(ema_final)
+plt.figure(figsize=figsize)
+sns.histplot(ema_final, stat='density', kde=True)
 
 # Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
 g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
+sns.kdeplot(g, color='orange')
 
 
 # ### Probability distribution of EMA values within a single time series for small $\alpha$ value
@@ -366,9 +380,10 @@ print("Asymptotic Var[EMA]: {:.3g}".format(alpha / (2 - alpha) * x_var))
 print("Approximate Asymptotic Var[EMA]: {:.3g}".format(alpha / 2 * x_var))
 
 # Visualize distribution of time series values
-sns.distplot(ema_time_series)
+plt.figure(figsize=figsize)
+sns.histplot(ema_time_series, stat='density', kde=True)
 
 # Compare with Gaussian distribution with parameters (mu = E[EMA], sigma^2 = Var[EMA])
 g = np.random.normal(ema_mean, np.sqrt(ema_var), size=[num_ensemble_samples])
-sns.kdeplot(g)
+sns.kdeplot(g, color='orange')
 
