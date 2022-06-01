@@ -46,9 +46,6 @@
 # 
 # #### 2022-05-14
 # - Replaced `seaborn.distplot()` with `seaborn.histplot()` because `distplot()` has been deprecated.
-# 
-# #### 2020-07-04
-# - Near-initial version.
 
 # In[1]:
 
