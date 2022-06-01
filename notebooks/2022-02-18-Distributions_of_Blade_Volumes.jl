@@ -288,3 +288,48 @@ edf_signed = normalize(hist_signed; mode=:pdf);
 
 hist = fit(Histogram, volumes; nbins=num_hist_bins)
 edf = normalize(hist; mode=:pdf);
+
+# --- Generate blades
+
+# Parameters
+n = 500;  # dimension of space
+s = 10;  # grade of blades
+
+# Generate sample of vectors
+blades, uniformity_stats = generate_blades(n, s, sample_size)
+if !uniformity_stats[:success]
+    println("FAILED to generated sample with sufficient uniformity on unit $(n)-sphere.")
+    display(uniformity_stats)
+end
+
+# --- Compute blade volumes
+
+signed_volumes = Vector{Float64}()
+for i = 1:sample_size
+    F = qr(blades[i])
+    signed_volume = det(F.R)
+    push!(signed_volumes, signed_volume)
+end
+
+volumes = abs.(signed_volumes);
+
+# --- Compute distributions
+
+# Histogram parameters
+num_hist_bins = 50
+
+# Plot histograms
+hist_bins_signed = range(-1, 1; length=num_hist_bins)
+plt_signed = plot(histogram(signed_volumes; bins=hist_bins_signed, normalize=true))
+
+hist_bins = range(0, 1; length=num_hist_bins)
+plt = plot(histogram(volumes; bins=hist_bins, normalize=true))
+display(plt_signed)
+display(plt)
+
+# Compute empirical volume distributions
+hist_signed = fit(Histogram, signed_volumes; nbins=num_hist_bins)
+edf_signed = normalize(hist_signed; mode=:pdf);
+
+hist = fit(Histogram, volumes; nbins=num_hist_bins)
+edf = normalize(hist; mode=:pdf);
