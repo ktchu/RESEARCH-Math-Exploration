@@ -1,3 +1,5 @@
+θ
+
 # --- User Parameters
 
 # Number of samples to use to estimate probability distributions
