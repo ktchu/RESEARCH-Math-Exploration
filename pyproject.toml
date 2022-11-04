@@ -2,45 +2,69 @@
 name = "Math Explorations"
 version = "0.0.0"
 description = ""
+license = "Apache-2.0"
+readme = "README.md"
 authors = ["Kevin T. Chu <kevin@velexi.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
-dvc = {extras = ["all"], version = "^2.10.1"}
+bcrypt = "^3.2.2"
+dvc = {extras = ["s3", "ssh"], version = "^2.33.2"}
 fastds = "^0.6.0"
-ipython = "^8.2.0"
-jupyterlab = "^3.3.4"
-mlflow = "^1.25.1"
-python-slugify = "^6.1.1"
+ipython = "^8.4"
+jupyterlab = "^3.4"
+mlflow = "^1.27"
+pdoc = "^12.2.0"
+python-slugify = "^6.1"
 PyYAML = "^6.0"
-typer = "^0.4.1"
-pdoc3 = "^0.10.0"
-tqdm = "^4.64.0"
+tqdm = "^4.64"
+typer = "^0,>=0.6"
 matplotlib = "^3.5.2"
-numpy = ">=1.22"
+numpy = "^1.22.4"
 pandas = "^1.4.2"
-scipy = "^1.8.0"
 seaborn = "^0.11.2"
-numba = "^0.55.1"
+numba = "^0.55.2"
 
 # security vulnerability fixes
-mistune = "^2.0.3"
 pywin32 = [
     { version = '>=301', platform = 'win32' },
 ]
 
-[tool.poetry.dev-dependencies]
-# TODO: change section name to [tool.poetry.group.dev.dependencies]
-#       after poetry 1.2.0 is released.
-coverage = "^6.3.2"
-flake8 = "^4.0.1"
-pylint = "^2.13.7"
-pytest = "^7.1.1"
-pytest-cov = "^3.0.0"
-pytest-flake8 = "^1.1.1"
-pytest-pylint = "^0.18.0"
-pytest-xdist = "^2.5.0"
+[tool.poetry.group.code-quality.dependencies]
+black = "^22.10.0"
+flake8 = "<5.0.0"  # Unpin after compatibility with pytest-flake8 is fixed
+pre-commit = "^2.20.0"
 radon = "^5.1.0"
+
+[tool.poetry.group.test.dependencies]
+coverage = "^6.4"
+pylint = "^2.14"
+pytest = "^7.1"
+pytest-cov = "^3.0"
+pytest-flake8 = "^1.1"
+pytest-pylint = "^0.18.0"
+pytest-xdist = "^2.5"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra --doctest-modules --flake8 --cov --cov-report="
+testpaths = [
+    "src",
+    "tests"
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+    "ALLOW_UNICODE",
+    "ALLOW_BYTES",
+]
+norecursedirs = ["data", "docs", "extras", "notebooks", "spikes"]
+
+[tool.coverage.run]
+source = ["src/"]
+
+[tool.coverage.report]
+omit = ["*/tests/*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
