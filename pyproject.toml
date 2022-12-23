@@ -57,7 +57,7 @@ doctest_optionflags = [
     "ALLOW_UNICODE",
     "ALLOW_BYTES",
 ]
-norecursedirs = ["data", "docs", "extras", "notebooks", "spikes"]
+norecursedirs = ["data", "docs", "extras", "notebooks", "reports", "spikes"]
 
 [tool.coverage.run]
 source = ["src/"]
